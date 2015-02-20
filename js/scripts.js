@@ -128,9 +128,9 @@ var Game = {
     return runningTotal;
   },
   determineWinner: function() {
-    if (this.dealer.hand.length === 2 && this.dealer.score === 21 || this.user.score > 21 ) {
+    if (this.user.score > 21 || (this.dealer.hand.length === 2 && this.dealer.score === 21)) {
       return false;
-    } else if (((this.player.hand.length === 2) && (this.user.score === 21)) || (this.dealer.score > 21)) {
+    } else if ((this.dealer.score > 21) || (this.user.score === 21 && this.user.hand.length === 2)) {
       return true;
     } else if (this.dealer.score > this.user.score) {
       return false;
@@ -203,7 +203,7 @@ $(function(){
       $("#show-results").hide();
       $("#hidden-display").show();
 
-      if (newGame.determineWinner) {
+      if (newGame.determineWinner()) {
         $("#results-display").text("User")
       } else {
         $("#results-display").text("Dealer")
