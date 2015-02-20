@@ -9,6 +9,31 @@
   </head>
   <body>
     <div class = "container">
+      <h1> BlackJack!! </h1>
+      <button id= "start-game" class="btn btn-primary">Start</button>
+
+      <div id="dealer-well" class="well">
+        <h5>Dealer Score: <span id="dealer-score">0</span></h5>
+        <p id="dealer-cards"></p>
+        <div id="dealer-button">
+          <button "dealer-button" class="btn btn-warning">Dealer Hits</button>
+        </div>
+      </div>
+
+      <div id="user-well" class="well">
+        <h5>User Score: <span id="user-score">0</span></h5>
+        <p id="user-cards"></p>
+      </div>
+
+      <div id="user-buttons">
+        <button id="hit"  class="btn btn-success">Hit</button>
+        <button id="stay" class="btn btn-info">Stay</button>
+      </div>
+
+      <div id="results" class="well">
+        <p id="hidden-display"><span id="results-display"></span> wins!</p>
+        <button id="show-results">Show Results</button>
+      </div>
     </div>
   </body>
 </html>

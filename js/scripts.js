@@ -17,6 +17,9 @@ var Card = {
   assignSuit: function(suit) {
     this.suit = suit;
   },
+  displayText: function() {
+    return this.value + " of " + this.suit;
+  }
 }
 
 var Player =  {
@@ -25,6 +28,8 @@ var Player =  {
     this.dealer = false;
     this.turn = true;
     this.score = 0;
+    this.showDealerCard = true;
+    this.name = "user"
   },
   hit: function(deck) {
     deck.dealCard(this.hand);
@@ -40,11 +45,19 @@ var Player =  {
     this.dealer = true;
     this.showDealerCard = false;
     this.turn = false;
+    this.name = "dealer"
   },
 
   dealerHitOrStay: function() {
     return this.score < 17;
   },
+  handValues: function() {
+    var handValues = [];
+    this.hand.forEach(function(card){
+      handValues.push(card.value)
+    });
+    return handValues;
+  }
 };
 
 var Deck =  {
@@ -82,6 +95,7 @@ var Game = {
     this.dealer.makeDealer();
     this.gameDeck = Object.create(Deck);
     this.gameDeck.initialize();
+    this.dealFlop();
   },
   dealFlop: function() {
     this.user.flop(this.gameDeck);
@@ -109,14 +123,113 @@ var Game = {
     for (var i = 0; i < handValues.length; i++) {
       if ((handValues[i] === "A") && (runningTotal > 21)) {
         runningTotal -= 10
-      } 
+      }
     }
     return runningTotal;
   },
+  determineWinner: function() {
+    if (this.dealer.hand.length === 2 && this.dealer.score === 21 || this.user.score > 21 ) {
+      return false;
+    } else if (((this.player.hand.length === 2) && (this.user.score === 21)) || (this.dealer.score > 21)) {
+      return true;
+    } else if (this.dealer.score > this.user.score) {
+      return false;
+    } else {
+      return true;
+    }
+  }
 };
 
 
 
+$(function(){
+  $("#start-game").click(function(){
+    var newGame = Object.create(Game);
+    newGame.initialize();
+    var user = newGame.user;
+    var dealer = newGame.dealer;
+    var gameDeck = newGame.gameDeck;
+    showPlayerHand(dealer);
+    showPlayerHand(user);
+    user.score = newGame.calculateScore(user.handValues())
+    dealer.score = newGame.calculateScore(dealer.handValues())
+    $("#user-score").text(user.score);
+
+    $("#hit").click(function(){
+      user.hit(gameDeck);
+      showPlayerHand(user);
+      user.score = newGame.calculateScore(user.handValues())
+      $("#user-score").text(user.score);
+
+      if (user.score > 21) {
+        newGame.showDealerCard();
+        $("#user-buttons").hide();
+        $("#dealer-score").text(dealer.score);
+
+        if (dealer.score < 17) {
+          $("#dealer-button").show();
+        } else if (dealer.score >= 17) {
+          $("#results").show()
+        }
+        showPlayerHand(dealer);
+      }
+    });
+
+    $("#stay").click(function(){
+      newGame.showDealerCard();
+      $("#user-buttons").hide();
+      $("#dealer-score").text(dealer.score);
+
+      if (dealer.score < 17) {
+        $("#dealer-button").show();
+      } else if (dealer.score > 17) {
+        $("#results").show()
+      }
+      showPlayerHand(dealer);
+    });
+
+    $("#dealer-button").click(function(){
+      dealer.hit(gameDeck);
+      showPlayerHand(dealer);
+      dealer.score = newGame.calculateScore(dealer.handValues());
+      $("#dealer-score").text(dealer.score);
+      if (dealer.score > 16) {
+        $("#dealer-button").hide();
+        $("#results").show()
+      }
+    });
+
+    $("#show-results").click(function(){
+      $("#show-results").hide();
+      $("#hidden-display").show();
+
+      if (newGame.determineWinner) {
+        $("#results-display").text("User")
+      } else {
+        $("#results-display").text("Dealer")
+      }
+    });
+
+
+
+  });
+});
+
+var showPlayerHand = function(player){
+  $("#user-cards").text("");
+  $("#dealer-cards").text("");
+  if (!player.showDealerCard) {
+    $('#dealer-cards').append(player.hand[0].displayText())
+  } else if (player.name === "user") {
+    for( var i = 0; i < player.hand.length; i++) {
+      $("#user-cards").append(player.hand[i].displayText() + " ")
+    }
+  } else {
+    for( var i = 0; i < player.hand.length; i++) {
+      $("#dealer-cards").append(player.hand[i].displayText() + " ")
+    }
+  }
+}
 
 //Fisher-Yates shuffle function
 

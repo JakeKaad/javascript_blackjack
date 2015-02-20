@@ -14,6 +14,15 @@ describe("Card", function(){
       expect(aceOfSpades.suit).to.equal("Spades")
     });
   });
+
+  describe("displayText", function(){
+    it ("returns a formatted string based on card value and suit", function(){
+      var aceOfSpades = Object.create(Card);
+      aceOfSpades.assignValue("A")
+      aceOfSpades.assignSuit("Spades")
+      expect(aceOfSpades.displayText()).to.equal("A of Spades")
+    });
+  });
 });
 
 describe("Player", function(){
@@ -102,7 +111,6 @@ describe("Game", function() {
     it("deals two cards to each player", function(){
       var newGame = Object.create(Game);
       newGame.initialize();
-      newGame.dealFlop();
       expect(newGame.user.hand.length).to.equal(2);
       expect(newGame.dealer.hand.length).to.equal(2);
     });
